@@ -138,7 +138,6 @@ function setBlock(){
     blck_id=${4%%.*}
     data=${5:-0}
     data=${data%%.*}
-    echo "${x},${y},${z},${blck_id},${data}"
     #  Set block (x,y,z,id,[data])
     send "world.setBlock(${x},${y},${z},${blck_id},${data})"
 }

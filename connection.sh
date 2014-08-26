@@ -31,11 +31,17 @@ then
         #Get lowest free file descriptor above 9
         exec {tcpFd}<> /dev/tcp/${address}/${port}
        # echo "Using File Descriptor $tcpFd"
+        if [ -z $tcpFd ]
+        then
+            echo "Unable to connect socket. Exiting"
+            exit 1
+        fi
     }
     
     function drain(){
         local input
-        while read -t 0 input 
+        # timeout of 0.1 nedded to get drained data
+        while read -t 0.1 input 
         do
             # Note this is a defensive break out for case where 
             # read returns success value but $input is an empty string
@@ -44,12 +50,14 @@ then
                 break
             fi
             echo "Drained Data: $input"
+            echo "LastSent : $lastSent"
         done
     }<&$tcpFd >&2
     
     function send(){
        drain
-       echo $1"\n" 
+       lastSent=$1
+       echo $1"\n"
     } >&$tcpFd
     
     function receive(){
